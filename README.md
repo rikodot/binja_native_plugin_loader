@@ -8,7 +8,7 @@ On the start of Binary Ninja, this script checks if the related native plugin is
 1. create your native plugin for Binary Ninja
 2. configure the script, there are 7 variables to be filled on the beginning of the file
 3. follow official Binary Ninja tutorial on how to write plugins
-4. create one github repository for the native plugin itself (use github releases to push updates)
+4. create one github repository for the native plugin itself (use github releases to push updates, each release needs to contain binaries for all supported operating systems - if you want to support let's say only linux, leave windows and macos variables in the script blank - read comments within the script or check out the example above for more context)
 5. create second github repository for the loader (this is the one you are going to index within the Binary Ninja's plugin manager)
 6. for updating the native plugin, push a new release on its github repository, this loader will prompt all users to update on the next start of Binary Ninja
 
