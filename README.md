@@ -23,6 +23,7 @@ Compiled native plugins are usable only on specific versions of Binary Ninja bas
 - 3.1.3469
   - `core_version()` returns `'3.1.3469 Personal'`
   - `core_version_info()` returns `not yet implemented`
+
 For this reason I decided to use `core_version()` to determine current version of Binary Ninja.<br>
 As an example let's say you used 3.1.3469's API version to compile your native plugin. You should test each and every Binary Ninja version until you find the lowest and highest supported version. When you are done testing, make sure to setup variables accordingly. More detailed information regarding this can be found along with examples in the script comments.<br>
 You can compile your native plugin for multiple Binary Ninja versions to have the widest compatibility (switch version in Binary Ninja -> follow [build process](https://github.com/rikodot/binja_native_sigscan#build-process) - in order to compile native plugin you need to have according Binary Ninja version currently installed or save and re-link static libraries for each Binary Ninja version from `C:\Program Files\Vector35\BinaryNinja`). When switching from one Binary Ninja version to a different one, old native plugin will be loaded and unloaded right after due to API version mismatch producing an error in the log. There is nothing loader can do to prevent this from happening, however this should occur only on the first start of Binary Ninja after switching versions as loader will delete incompatible binary and download compatible one, if found.
