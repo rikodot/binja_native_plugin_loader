@@ -32,10 +32,13 @@ file_url = 'https://github.com/{}/{}/releases/latest/download'.format(repo_owner
 
 # File names in release section on github along with Binary Ninja versions for which they were compiled (leave whole variable blank if platform not supported)
 # Both version variables are inclusive meaning any Binary Ninja version in between is supported, DO NOT include '-dev' suffix so instead of '3.4.4189-dev', use just '3.4.4189')
+# You can also support all dev version by replacing both versions with 'DEV' (example below), this is useful because new dev versions roll out almost on daily basis
+# but the problem is when dev version becomes stable, the loader must be updated accordingly
 # Example:
 # win_files = [
-#    ('3.1.3469', '3.3.3996', 'sigscan.dll'),
-#    ('3.4.4169', '3.4.4189', 'sigscan_dev.dll')
+#    ('3.1.3469', '3.3.3996', 'sigscan.dll'), # anything in between 3.1.3469 and 3.3.3996 (inclusive) - specific stable versions
+#    ('3.4.4169', '3.4.4189', 'sigscan_dev.dll'), # anything in between 3.4.4169 and 3.4.4189 (inclusive) - specific dev versions
+#    ('DEV', 'DEV', 'sigscan_dev2.dll'), # anything in between 3.4.4169 and 3.4.4189 (inclusive) - all dev versions
 #    ]
 win_files = []
 linux_files = []
@@ -46,21 +49,30 @@ def is_version_supported(files):
     # Get current Binary Ninja version
     version_numbers = binaryninja.core_version().split()[0].split('-')[0].split('.')
     major, minor, build = map(int, version_numbers)
+    dev_file = None
 
     # Loop through files for current platform and see if our version is supported by any
     for entry in files:
         min_ver, max_ver, file = entry
 
-        min_parts = min_ver.split('.')
-        max_parts = max_ver.split('.')
+        # first check all non dev versions (there might be specific binary for specific dev versions so use that and if none found then we can use binary for all dev versions)
+        if (min_ver != 'DEV' and max_ver != 'DEV'):
+            min_parts = min_ver.split('.')
+            max_parts = max_ver.split('.')
 
-        major_match = (major >= int(min_parts[0]) and major <= int(max_parts[0]))
-        minor_match = (minor >= int(min_parts[1]) and minor <= int(max_parts[1]))
-        build_match = (build >= int(min_parts[2]) and build <= int(max_parts[2]))
+            major_match = (major >= int(min_parts[0]) and major <= int(max_parts[0]))
+            minor_match = (minor >= int(min_parts[1]) and minor <= int(max_parts[1]))
+            build_match = (build >= int(min_parts[2]) and build <= int(max_parts[2]))
 
-        if major_match and minor_match and build_match:
-            return file
+            if major_match and minor_match and build_match:
+                return file
+        else:
+            dev_file = file
     
+    # If we are on dev, check if there is a file for all dev versions
+    if ('-dev' in binaryninja.core_version() and dev_file != None and len(dev_file) > 0):
+        return dev_file
+
     return None
 
 # Function that determines whether system is supported
